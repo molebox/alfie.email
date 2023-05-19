@@ -12,6 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       from: "hello@alfie.email",
       to: ["to@example.com"],
       subject: "hello world",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       react: EmailTemplate({ firstName: "John", product: "Resend" }),
     });
 
