@@ -12,7 +12,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       from: "hello@alfie.email",
       to: ["to@example.com"],
       subject: "hello world",
-      react: EmailTemplate({ firstName: "John", product: "Resend" }),
+      // react: EmailTemplate({ firstName: "John", product: "Resend" }),
     });
 
     res.status(200).json({ data });
