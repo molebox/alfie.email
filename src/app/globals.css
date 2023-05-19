@@ -25,3 +25,25 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+@keyframes flash {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.text-cursor {
+  animation: flash 1.5s infinite;
+  width: 2px;
+  height: 1em;
+  background-color: #e2e8f0;
+  position: absolute;
+  bottom: 0.15em;
+
+}
