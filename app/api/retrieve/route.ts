@@ -3,8 +3,8 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.EMAIL_API_KEY);
 
-export async function POST(response: Response) {
-  const { id } = await response.json();
+export async function POST(request: Request) {
+  const { id } = await request.json();
   try {
     const data = await resend.emails.get(id);
 
