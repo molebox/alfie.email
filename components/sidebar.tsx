@@ -3,7 +3,7 @@
 import { capitalizeFirstLetter, cn } from "@/lib/utils"
 import { Button } from "./ui/button"
 import { ScrollArea } from "./ui/scroll-area"
-import { HeartIcon, ExclamationTriangleIcon, BuildingLibraryIcon, BriefcaseIcon, UserGroupIcon, GlobeEuropeAfricaIcon, ShoppingBagIcon, PlusCircleIcon, PencilIcon } from "@heroicons/react/24/outline"
+import { HeartIcon, ExclamationTriangleIcon, BuildingLibraryIcon, BriefcaseIcon, UserGroupIcon, GlobeEuropeAfricaIcon, ShoppingBagIcon, PlusCircleIcon, BookmarkIcon } from "@heroicons/react/24/outline"
 import { Separator } from "./ui/separator"
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar"
 import {
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
-import { RefObject, useEffect, useRef, useState } from "react"
+import { RefObject, useEffect, useRef, useState, ReactNode, useMemo } from "react"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, UseFormReturn } from "react-hook-form"
@@ -27,6 +27,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { MinusCircleIcon } from "lucide-react"
+import { Badge } from "./ui/badge"
+import { FolderType, defaultFolders, useFolderContext, userFolders } from "@/lib/context"
 
 
 
@@ -34,19 +36,24 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
 }
 
-const formSchema = z.object({
-  newFolder: z.string().min(3, {
-    message: "Folder must be at least 3 characters."
-  }).max(50, {
-    message: "Folder can be max 50 characters."
-  })
-});
-
-
 
 export function Sidebar({ className }: SidebarProps) {
-  const [folders, setFolders] = useState<string[]>([]);
+  const [folders, setFolders] = useState<FolderType[]>(userFolders);
   const formRef: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null);
+  const { selectedFolder, setSelectedFolder } = useFolderContext();
+
+  const formSchema = useMemo(() => z.object({
+    newFolder: z.string().min(3, {
+      message: "Folder must be at least 3 characters."
+    }).max(50, {
+      message: "Folder can be max 50 characters."
+    }).refine(name => {
+      const lowerCaseName = name.toLowerCase();
+      return !folders.some(folder => folder.name.toLowerCase() === lowerCaseName);
+    }, {
+      message: "Folder name already exists."
+    })
+  }), [folders, selectedFolder?.unreadEmails]);
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,13 +66,29 @@ export function Sidebar({ className }: SidebarProps) {
   const { handleSubmit, register, formState: { errors } } = form;
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setFolders([...folders, capitalizeFirstLetter(values.newFolder)]);
+    const newFolder: FolderType = {
+      name: capitalizeFirstLetter(values.newFolder),
+      space: values.newFolder.toLowerCase().split(' ').join('-'),
+      icon: <BookmarkIcon className="mr-2 h-4 w-4" />,
+      deletable: true,
+      unreadEmails: 0
+    };
+    setFolders([...folders, newFolder]);
     form.reset({ newFolder: '' });
   }
 
   function removeFolder(folderToRemove: string) {
-    setFolders(folders.filter(folder => folder !== folderToRemove));
+    // If the folder to remove is the currently selected one, switch to "Standard"
+    if (selectedFolder?.space === folderToRemove) {
+      const standardUnreadEmails = selectedFolder.unreadEmails; // fetch or retrieve the current 'unreadEmails' for 'Standard'
+      setSelectedFolder({ name: 'Standard', space: 'standard', unreadEmails: standardUnreadEmails });
+    }
+
+    // Filter out the removed folder from the folders list
+    setFolders(folders.filter(folder => folder.space !== folderToRemove));
   }
+
+
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -81,7 +104,7 @@ export function Sidebar({ className }: SidebarProps) {
   }, [form]);
 
   return (
-    <div className={cn("pb-12 bg-slate-50 min-h-screen", className)}>
+    <div className={cn("pb-12 bg-slate-50 min-h-screen sticky top-0", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 pb-2">
           <div className="flex items-center justify-start px-3">
@@ -96,22 +119,29 @@ export function Sidebar({ className }: SidebarProps) {
             Inboxes
           </h2>
           <div className="space-y-1">
-            <Button variant="secondary" className="w-full justify-start">
+            {defaultFolders.map(folder => (
+              <Button key={folder.space} variant="ghost" className="w-full justify-start" onClick={() => setSelectedFolder({ name: folder.name, space: folder.name.toLocaleLowerCase(), unreadEmails: folder.unreadEmails })}>
+                {folder.icon}
+                {folder.name}
+                {folder.unreadEmails !== 0 ? <Badge variant='outline' className="ml-auto bg-red-100 border-slate-600">{folder.unreadEmails}</Badge> : null}
+              </Button>
+            ))}
+            {/* <Button variant="secondary" className="w-full justify-start" onClick={() => setSelectedFolder('Standard')}>
               <BuildingLibraryIcon className="mr-2 h-4 w-4" />
               Standard
             </Button>
-            <Button variant="ghost" className="w-full justify-start">
+            <Button variant="ghost" className="w-full justify-start" onClick={() => setSelectedFolder('Favorites')}>
               <HeartIcon className="mr-2 h-4 w-4" />
               Favorites
             </Button>
-            <Button variant="ghost" className="w-full justify-start">
+            <Button variant="ghost" className="w-full justify-start" onClick={() => setSelectedFolder('Important')}>
               <ExclamationTriangleIcon className="mr-2 h-4 w-4" />
               Important
             </Button>
-            <Button variant="ghost" className="w-full justify-start">
+            <Button variant="ghost" className="w-full justify-start" onClick={() => setSelectedFolder('Work')}>
               <BriefcaseIcon className="mr-2 h-4 w-4" />
               Work
-            </Button>
+            </Button> */}
           </div>
         </div>
         <div className="px-3 py-2">
@@ -144,30 +174,21 @@ export function Sidebar({ className }: SidebarProps) {
 
           </div>
           <div className="space-y-1">
-            <Button variant="ghost" className="w-full justify-start">
-              <UserGroupIcon className="mr-2 h-4 w-4" />
-              Family
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <GlobeEuropeAfricaIcon className="mr-2 h-4 w-4" />
-              Travel
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <ShoppingBagIcon className="mr-2 h-4 w-4" />
-              Shopping
-            </Button>
             <div className="space-y-1">
               {folders.map(folder => (
-                <Button key={folder} variant="ghost" className="w-full justify-start">
-                  <PencilIcon className="mr-2 h-4 w-4" />
-                  {folder}
-                  <MinusCircleIcon
-                    className="ml-auto h-4 w-4 hover:text-red-300"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevents triggering the Button's onClick 
-                      removeFolder(folder);
-                    }}
-                  />
+                <Button key={folder.space} variant="ghost" className="w-full justify-start" onClick={() => setSelectedFolder({ name: folder.name, space: folder.name.toLocaleLowerCase(), unreadEmails: folder.unreadEmails })}>
+                  {folder.icon}
+                  {folder.name}
+                  {folder.unreadEmails !== 0 ? <Badge variant='outline' className="ml-auto bg-red-100 border-slate-600">{folder.unreadEmails}</Badge> : null}
+                  {folder.deletable &&
+                    <MinusCircleIcon
+                      className="ml-auto h-4 w-4 hover:text-red-300"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevents triggering the Button's onClick 
+                        removeFolder(folder.space);
+                      }}
+                    />
+                  }
                 </Button>
               ))}
             </div>
