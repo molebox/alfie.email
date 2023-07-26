@@ -1,5 +1,21 @@
-import { NextResponse } from 'next/server';
-// import { Resend } from 'resend';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: Request) {
+  const formData = await request.formData()
+
+  const from = formData.get('from')
+  const to = formData.get('to')
+  const subject = formData.get('subject')
+  const text = formData.get('text')
+  const html = formData.get('html')
+
+  // do something with the email data...
+  
+  return NextResponse.json({ from, to, subject, text, html })
+}
+
+
+  // import { Resend } from 'resend';
 
 // const resend = new Resend(process.env.EMAIL_API_KEY);
 
@@ -13,18 +29,3 @@ import { NextResponse } from 'next/server';
 //     return NextResponse.json({ error });
 //   }
 // }
-
-export async function POST(request: Request) {
-  const data = await request.json();
-  console.log(data);
-  return NextResponse.json('Email received', {
-    status: 200
-  });
-  // try {
-  //   return NextResponse.json('Email received', {
-  //     status: 200
-  //   });
-  // } catch (error) {
-  //   return NextResponse.json({ error });
-  // }
-}
