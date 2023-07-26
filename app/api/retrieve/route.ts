@@ -9,8 +9,10 @@ export async function POST(request: Request) {
   const text = formData.get('text')
   const html = formData.get('html')
 
+  console.log('DATA: ', { from, to, subject, text, html })
+
   // do something with the email data...
-  
+
   return NextResponse.json({ from, to, subject, text, html })
 }
 
