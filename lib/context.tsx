@@ -1,7 +1,12 @@
 'use client'
-import { BuildingLibraryIcon, ExclamationTriangleIcon, GlobeEuropeAfricaIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { BuildingLibraryIcon, ExclamationTriangleIcon, GlobeEuropeAfricaIcon, PlusCircleIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { BriefcaseIcon, HeartIcon, ShoppingBagIcon } from 'lucide-react';
 import React, { createContext, useState, useContext, ReactNode } from 'react';
+
+type Label = {
+  name: string;
+  color: string;
+}
 
 export type FolderType = {
   name: string;
@@ -9,6 +14,7 @@ export type FolderType = {
   unreadEmails: number;
   icon?: ReactNode;
   deletable?: boolean;
+  labels?: Label[];
 };
 
 type FolderContextType = {
@@ -17,6 +23,7 @@ type FolderContextType = {
 };
 
 export const defaultFolders: FolderType[] = [
+  { name: 'Compose', space: 'compose', unreadEmails: 0, icon: <PlusCircleIcon className="mr-2 h-4 w-4" />, deletable: false },
   { name: 'Standard', unreadEmails: 9, space: 'standard', icon: <BuildingLibraryIcon className="mr-2 h-4 w-4" />, deletable: false },
   { name: 'Favorites', unreadEmails: 2, space: 'favorites', icon: <HeartIcon className="mr-2 h-4 w-4" />, deletable: false },
   { name: 'Important', unreadEmails: 11, space: 'important', icon: <ExclamationTriangleIcon className="mr-2 h-4 w-4" />, deletable: false },

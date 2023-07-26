@@ -25,7 +25,7 @@ export default function Dashboard() {
   const { selectedFolder, setSelectedFolder } = useFolderContext();
 
   async function sendEmail() {
-    await fetch('/api/send', {
+    await fetch('/api/retrieve', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -33,9 +33,9 @@ export default function Dashboard() {
       body: JSON.stringify({
         to: ['hello@richardhaines.dev'],
         from: 'hello@alfie.email',
-        subject: 'Yo it works!',
+        subject: 'Testing SendGrid',
         firstName: 'Richard',
-        product: 'Next.js'
+        content: 'Next.js'
       })
     })
       .then((res) => res.json())
@@ -53,38 +53,49 @@ export default function Dashboard() {
             <div className="grid lg:grid-cols-5">
               <Sidebar className="hidden lg:block" />
               <div className="col-span-3 lg:col-span-4 lg:border-l">
-                <div className="h-full px-4 py-6 lg:px-8">
-                  <Tabs defaultValue="unread" className="h-full space-y-6">
-                    <div className="space-between flex items-center">
-                      <TabsList>
-                        <TabsTrigger value="unread" className="relative">
-                          Unread
-                        </TabsTrigger>
-                        <TabsTrigger value="read">Read</TabsTrigger>
-                      </TabsList>
-                      <div className="ml-auto mr-4">
-                        <Button variant='secondary' onClick={sendEmail}>
-                          <PlusCircleIcon className="mr-2 h-4 w-4" />
-                          Compose
-                        </Button>
-                      </div>
-                    </div>
-                    <TabsContent
-                      value="unread"
-                      className="border-none p-0 outline-none"
-                    >
-                      {selectedFolder && <EmailFolder />}
-                    </TabsContent>
-                    <TabsContent
-                      value="read"
-                      className="h-full flex-col border-none p-0 data-[state=active]:flex"
-                    >
-                      <ScrollArea className="h-72 w-48 rounded-md border">
-                        {selectedFolder && <EmailFolder />}
-                      </ScrollArea>
-                    </TabsContent>
-                  </Tabs>
-                </div>
+                {selectedFolder.space !== 'compose' ? (
+                  <div className="h-full px-4 py-6">
+                    {selectedFolder.space !== 'compose' ? (
+                      <Tabs defaultValue="unread" className="h-full space-y-6">
+                        <div className="space-between flex items-center px-6">
+                          <TabsList>
+                            <TabsTrigger value="unread" className="relative">
+                              Unread
+                            </TabsTrigger>
+                            <TabsTrigger value="read">Read</TabsTrigger>
+                          </TabsList>
+                          {/* <div className="ml-auto mr-4">
+                                      <Button variant='secondary' onClick={sendEmail}>
+                                        <PlusCircleIcon className="mr-2 h-4 w-4" />
+                                        Compose
+                                      </Button>
+                                    </div> */}
+                          <div className="ml-auto mr-4">
+                            <Button variant='secondary' onClick={sendEmail}>
+                              <PlusCircleIcon className="mr-2 h-4 w-4" />
+                              Compose
+                            </Button>
+                          </div>
+                        </div>
+                        <TabsContent
+                          value="unread"
+                          className="border-none p-0 outline-none"
+                        >
+                          {selectedFolder && <EmailFolder />}
+                        </TabsContent>
+                        <TabsContent
+                          value="read"
+                          className="h-full flex-col border-none p-0 data-[state=active]:flex"
+                        >
+                          <ScrollArea className="h-72 w-48 rounded-md border">
+                            {selectedFolder && <EmailFolder />}
+                          </ScrollArea>
+                        </TabsContent>
+                      </Tabs>
+                    ) : null}
+
+                  </div>
+                ) : <EmailFolder />}
               </div>
             </div>
           </div>

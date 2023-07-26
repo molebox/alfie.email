@@ -110,7 +110,7 @@ export function Sidebar({ className }: SidebarProps) {
           <div className="flex items-center justify-start px-3">
             <Avatar className="h-7 w-7">
               <AvatarImage src="https://github.com/molebox.png" alt="@molebox" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <span className="text-sm pl-3">Rich Haines</span>
           </div>
@@ -126,22 +126,6 @@ export function Sidebar({ className }: SidebarProps) {
                 {folder.unreadEmails !== 0 ? <Badge variant='outline' className="ml-auto bg-red-100 border-slate-600">{folder.unreadEmails}</Badge> : null}
               </Button>
             ))}
-            {/* <Button variant="secondary" className="w-full justify-start" onClick={() => setSelectedFolder('Standard')}>
-              <BuildingLibraryIcon className="mr-2 h-4 w-4" />
-              Standard
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => setSelectedFolder('Favorites')}>
-              <HeartIcon className="mr-2 h-4 w-4" />
-              Favorites
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => setSelectedFolder('Important')}>
-              <ExclamationTriangleIcon className="mr-2 h-4 w-4" />
-              Important
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => setSelectedFolder('Work')}>
-              <BriefcaseIcon className="mr-2 h-4 w-4" />
-              Work
-            </Button> */}
           </div>
         </div>
         <div className="px-3 py-2">

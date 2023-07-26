@@ -96,5 +96,94 @@
   background-color: #e2e8f0;
   position: absolute;
   bottom: 0.15em;
+}
 
+.ProseMirror {
+  > * + * {
+    margin-top: 0.75em;
+  }
+
+  min-height: 100vh;
+  
+
+  ul,
+  ol {
+    padding: 0 1rem;
+  }
+
+  li {
+    list-style: disc;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.1;
+  }
+
+  h1 {
+    font-size: 2.25rem;
+  }
+  h2 {
+    font-size: 1.875rem;
+  }
+  h3 {
+    font-size: 1.5rem;
+  }
+  h4 {
+    font-size: 1.25rem;
+  }
+  h5 {
+    font-size: 1.125rem;
+  }
+  h6 {
+    font-size: 1rem;
+  }
+  p {
+    font-size: 1rem;
+  }
+
+  
+  code {
+    background: #e2e8f0;
+    padding: 0.2rem;
+    border-radius: 4px;
+    color: #18181b;
+    font-family: 'JetBrainsMono', monospace;
+  }
+
+  pre {
+    background: #e2e8f0;
+    color: #334155;
+    font-family: 'JetBrainsMono', monospace;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+
+    code {
+      color: #334155;
+      padding: 0;
+      background: none;
+      font-size: 0.8rem;
+    }
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  blockquote {
+    margin-left: 1.5rem;
+    padding-left: 1rem;
+    border-left: 2px solid #d4d4d8;
+  }
+
+  hr {
+    border: none;
+    border-top: 2px solid rgba(#0D0D0D, 0.1);
+    margin: 2rem 0;
+  }
 }

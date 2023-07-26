@@ -3,6 +3,19 @@ import { useFolderContext } from "@/lib/context"
 import { EmailCard } from "./email-card"
 import { Badge } from "./ui/badge"
 import { Separator } from "./ui/separator"
+import { EmailEditor } from "./email-editor"
+import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { EmailForm } from "./email-form"
 
 interface EmailFolderProps {
   className?: string
@@ -37,14 +50,20 @@ export function EmailFolder({ className }: EmailFolderProps) {
 
 
   return (
-    <div className="min-h-screen bg-background flex flex-col" onClick={handleClick}>
+    <div className="min-h-screen bg-background flex flex-col px-4 py-6 lg:px-8" onClick={handleClick}>
       <div className="justify-start p-2">
         <div className="flex max-w-54 items-center">
           <h2 className="text-lg font-light tracking-tight text-slate-500">{selectedFolder.name}</h2>
           {selectedFolder.unreadEmails !== 0 ? <Badge className=" text-slate-600 ml-6 font-semibold" variant="outline">{selectedFolder.unreadEmails} unread</Badge> : null}
         </div>
+        {selectedFolder.space === 'compose' ? (
+          <>
+            <Separator className="my-4" />
+            <EmailForm />
+          </>
+        ) : null}
       </div>
-      <Separator className="my-4" />
+      {selectedFolder.space === 'compose' ? <EmailEditor /> : null}
       <EmailCard
         sender="John Doe"
         subject="Super cool email"
@@ -63,6 +82,13 @@ export function EmailFolder({ className }: EmailFolderProps) {
         sender="Jane Doe"
         subject="Yet another cool email from one of your fav friends!"
         date="Today, 14:30pm"
+        blurb="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis."
+        unread
+      />
+      <EmailCard
+        sender="Bruce Wayne"
+        subject="I have a secret to tell you..."
+        date="Today, 15:30pm"
         blurb="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis."
         unread
       />
