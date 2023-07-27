@@ -19,9 +19,10 @@ import { EmailForm } from "./email-form"
 
 interface EmailFolderProps {
   className?: string
+  editor: any
 }
 
-export function EmailFolder({ className }: EmailFolderProps) {
+export function EmailFolder({ editor }: EmailFolderProps) {
   const { selectedFolder, setSelectedFolder } = useFolderContext();
 
   // async function getEmails() {
@@ -50,20 +51,20 @@ export function EmailFolder({ className }: EmailFolderProps) {
 
 
   return (
-    <div className="min-h-screen bg-background flex flex-col px-4 py-6 lg:px-8" onClick={handleClick}>
+    <div className="min-h-screen bg-background flex flex-col px-2 py-6" onClick={handleClick}>
       <div className="justify-start p-2">
-        <div className="flex max-w-54 items-center">
+        <div className="flex max-w-54 items-center mx-2">
           <h2 className="text-lg font-light tracking-tight text-slate-500">{selectedFolder.name}</h2>
           {selectedFolder.unreadEmails !== 0 ? <Badge className=" text-slate-600 ml-6 font-semibold" variant="outline">{selectedFolder.unreadEmails} unread</Badge> : null}
         </div>
         {selectedFolder.space === 'compose' ? (
-          <>
+          <div className="mx-2">
             <Separator className="my-4" />
             <EmailForm />
-          </>
+          </div>
         ) : null}
       </div>
-      {selectedFolder.space === 'compose' ? <EmailEditor /> : null}
+      {selectedFolder.space === 'compose' ? <EmailEditor editor={editor} /> : null}
       <EmailCard
         sender="John Doe"
         subject="Super cool email"

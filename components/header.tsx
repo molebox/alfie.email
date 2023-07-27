@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Dialog } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Button } from './ui/button'
+import { UserButton } from "@clerk/nextjs";
 
 const navigation = [
   { name: 'Product', href: '#' },
@@ -40,9 +41,11 @@ export function Header() {
             </a>
           ))}
         </div> */}
-        <Button className="hidden lg:flex lg:justify-end w-fit" variant='secondary' size='sm'>
+        <UserButton afterSignOutUrl="/" />
+
+        {/* <Button className="hidden lg:flex lg:justify-end w-fit" variant='secondary' size='sm'>
           Log in
-        </Button>
+        </Button> */}
       </nav>
       <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
         <div className="fixed inset-0 z-10" />
@@ -76,12 +79,13 @@ export function Header() {
                 ))}
               </div>
               <div className="py-6">
-                <a
+                <UserButton afterSignOutUrl="/" />
+                {/* <a
                   href="#"
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
                   Log in
-                </a>
+                </a> */}
               </div>
             </div>
           </div>

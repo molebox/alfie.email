@@ -16,7 +16,7 @@ import { Input } from "./ui/input"
 import { RefObject, useEffect, useRef, useState, ReactNode, useMemo } from "react"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, UseFormReturn } from "react-hook-form"
+import { set, useForm, UseFormReturn } from "react-hook-form"
 import {
   Form,
   FormControl,
@@ -29,18 +29,20 @@ import {
 import { MinusCircleIcon } from "lucide-react"
 import { Badge } from "./ui/badge"
 import { FolderType, defaultFolders, useFolderContext, userFolders } from "@/lib/context"
-
-
+import { SignIn, currentUser, useUser, UserButton } from "@clerk/nextjs";
+import { User } from "@clerk/nextjs/dist/types/server"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
 }
 
-
 export function Sidebar({ className }: SidebarProps) {
   const [folders, setFolders] = useState<FolderType[]>(userFolders);
   const formRef: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null);
   const { selectedFolder, setSelectedFolder } = useFolderContext();
+  const { isLoaded, isSignedIn, user } = useUser()
+
+  if (!user) return <SignIn afterSignInUrl='/dashboard' appearance={{ variables: { colorPrimary: "#000" } }} />;
 
   const formSchema = useMemo(() => z.object({
     newFolder: z.string().min(3, {
@@ -109,10 +111,10 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="px-3 pb-2">
           <div className="flex items-center justify-start px-3">
             <Avatar className="h-7 w-7">
-              <AvatarImage src="https://github.com/molebox.png" alt="@molebox" />
+              <AvatarImage src={user.profileImageUrl} alt={user.username!} />
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
-            <span className="text-sm pl-3">Rich Haines</span>
+            <span className="text-sm pl-3">{user.firstName! + ' ' + user.lastName!}</span>
           </div>
           <Separator className="my-4" />
           <h2 className="mb-2 px-4 text-lg font-light tracking-tight text-slate-500">

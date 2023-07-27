@@ -26,6 +26,7 @@ import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { Separator } from './ui/separator';
 import { Button } from './ui/button';
 
+
 function ToolbarDivider() {
   return (
     <span className="w-[1px] bg-slate-400 block h-full"></span>
@@ -93,6 +94,7 @@ export function ClearEditor({ icon, command, disabled, editor }: any) {
 }
 
 export function Toolbar({ editor }: any) {
+  
   if (!editor) {
     return null
   }
