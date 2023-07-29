@@ -26,18 +26,6 @@ export default async function DashboardLayout({ children }: {
     }
   });
 
-  if (existingUser) {
-
-    const findDatabase = await prisma.email.findFirst({
-      where: {
-        userId: existingUser?.id
-      }
-    });
-    console.log({ findDatabase });
-  }
-
-
-
   console.log({ existingUser });
 
   if (!existingUser) {

@@ -24,10 +24,10 @@ type FolderContextType = {
 
 export const defaultFolders: FolderType[] = [
   { name: 'Compose', space: 'compose', unreadEmails: 0, icon: <PlusCircleIcon className="mr-2 h-4 w-4" />, deletable: false },
-  { name: 'Standard', unreadEmails: 9, space: 'standard', icon: <BuildingLibraryIcon className="mr-2 h-4 w-4" />, deletable: false },
-  { name: 'Favorites', unreadEmails: 2, space: 'favorites', icon: <HeartIcon className="mr-2 h-4 w-4" />, deletable: false },
-  { name: 'Important', unreadEmails: 11, space: 'important', icon: <ExclamationTriangleIcon className="mr-2 h-4 w-4" />, deletable: false },
-  { name: 'Work', unreadEmails: 1, space: 'work', icon: <BriefcaseIcon className="mr-2 h-4 w-4" />, deletable: false },
+  { name: 'Standard', unreadEmails: 0, space: 'standard', icon: <BuildingLibraryIcon className="mr-2 h-4 w-4" />, deletable: false },
+  { name: 'Favorites', unreadEmails: 0, space: 'favorites', icon: <HeartIcon className="mr-2 h-4 w-4" />, deletable: false },
+  { name: 'Important', unreadEmails: 0, space: 'important', icon: <ExclamationTriangleIcon className="mr-2 h-4 w-4" />, deletable: false },
+  { name: 'Work', unreadEmails: 0, space: 'work', icon: <BriefcaseIcon className="mr-2 h-4 w-4" />, deletable: false },
 ];
 
 export const userFolders: FolderType[] = [
@@ -36,21 +36,21 @@ export const userFolders: FolderType[] = [
     space: 'family',
     icon: <UserGroupIcon className="mr-2 h-4 w-4" />,
     deletable: false,
-    unreadEmails: 2
+    unreadEmails: 0
   },
   {
     name: 'Travel',
     space: 'travel',
     icon: <GlobeEuropeAfricaIcon className="mr-2 h-4 w-4" />,
     deletable: false,
-    unreadEmails: 223
+    unreadEmails: 0
   },
   {
     name: 'Shopping',
     space: 'shopping',
     icon: <ShoppingBagIcon className="mr-2 h-4 w-4" />,
     deletable: false,
-    unreadEmails: 1
+    unreadEmails: 0
   },
 ];
 

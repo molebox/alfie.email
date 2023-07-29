@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
         type: 'RECEIVED',
         user: { connect: { id: user.id } },
         read: false,
+        folder: 'standard',
         CC: { create: ccAddresses },
         BCC: { create: bccAddresses },
       },

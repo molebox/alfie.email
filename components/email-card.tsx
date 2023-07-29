@@ -5,6 +5,8 @@ import { Badge } from "./ui/badge";
 import { truncate } from "@/lib/utils";
 import { LabelSwatch } from "./label-swatch";
 import { useState } from "react";
+import ReactHtmlParser from 'react-html-parser';
+import { transform } from '@/lib/utils'
 
 interface EmailCardProps {
   className?: string
@@ -18,6 +20,10 @@ interface EmailCardProps {
 
 export function EmailCard({ className, sender, subject, date, blurb, includesAttachment, unread }: EmailCardProps) {
   const [labels, setLabels] = useState<string[]>([])
+
+  const sanitizeHtml = (html: string) => {
+    return html.replace(/<!doctype html>|<html>|<\/html>|<head>.*<\/head>|<body>|<\/body>/g, '');
+  }
 
   return (
     <Card className="h-full my-4">
@@ -35,7 +41,7 @@ export function EmailCard({ className, sender, subject, date, blurb, includesAtt
         <Separator className="my-4" />
       </CardHeader>
       <CardContent className="flex flex-col">
-        <span className="text-sm">{truncate(blurb, 200)}</span>
+        <span className="max-h-3xl">{ReactHtmlParser(sanitizeHtml(blurb), { transform })}</span>
       </CardContent>
       <CardFooter className="flex items-center justify-between border-t px-6 py-3">
         <div className="items-center flex">

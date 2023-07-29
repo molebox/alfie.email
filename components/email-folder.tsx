@@ -1,3 +1,4 @@
+'use client'
 
 import { useFolderContext } from "@/lib/context"
 import { EmailCard } from "./email-card"
@@ -16,34 +17,43 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { EmailForm } from "./email-form"
+import { getEmails } from "@/lib/server-actions"
+import { useEffect, useState } from "react"
+import { formatDate } from "@/lib/utils"
+
 
 interface EmailFolderProps {
   className?: string
   editor: any
 }
 
+interface Email {
+  id: number;
+  from: string;
+  to: string;
+  subject: string;
+  body: string;
+  read: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  type: 'SENT' | 'RECEIVED';
+  userId: number;
+}
+
+
 export function EmailFolder({ editor }: EmailFolderProps) {
   const { selectedFolder, setSelectedFolder } = useFolderContext();
 
-  // async function getEmails() {
-  //   'use server'
-  //   const res = await fetch('/api/retrieve', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify({
-  //       id: '38406f24-7aa4-4da8-bda1-67c81772e03e'
-  //     })
-  //   })
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       console.log(data)
-  //     }
-  //     )
-  // }
+  const [emails, setEmails] = useState<Email[]>([]);
 
-  // getEmails();
+  useEffect(() => {
+    const fetchEmails = async () => {
+      const result = await getEmails();
+      setEmails(result);
+    };
+
+    fetchEmails();
+  }, []);
 
   const handleClick = () => {
     setSelectedFolder({ name: selectedFolder?.name, space: selectedFolder?.name.toLocaleLowerCase(), unreadEmails: selectedFolder?.unreadEmails });
@@ -65,34 +75,15 @@ export function EmailFolder({ editor }: EmailFolderProps) {
         ) : null}
       </div>
       {selectedFolder.space === 'compose' ? <EmailEditor editor={editor} /> : null}
-      <EmailCard
-        sender="John Doe"
-        subject="Super cool email"
-        date="Today, 12:30pm"
-        blurb="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis."
-        includesAttachment
-        unread
-      />
-      <EmailCard
-        sender="Barry Doe"
-        subject="Another cool email"
-        date="Today, 13:45pm"
-        blurb="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis."
-      />
-      <EmailCard
-        sender="Jane Doe"
-        subject="Yet another cool email from one of your fav friends!"
-        date="Today, 14:30pm"
-        blurb="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis."
-        unread
-      />
-      <EmailCard
-        sender="Bruce Wayne"
-        subject="I have a secret to tell you..."
-        date="Today, 15:30pm"
-        blurb="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis semper nisl. Sed euismod, nisl quis."
-        unread
-      />
+      {emails.length >= 1 ? emails.map((email: Email) => (
+        <EmailCard
+          key={email.id}
+          sender={email.from}
+          subject={email.subject}
+          date={formatDate(email.createdAt.toString())}
+          blurb={email.body}
+        />
+      )) : null}
     </div>
   )
 }

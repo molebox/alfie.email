@@ -30,7 +30,7 @@ import { MinusCircleIcon } from "lucide-react"
 import { Badge } from "./ui/badge"
 import { FolderType, defaultFolders, useFolderContext, userFolders } from "@/lib/context"
 import { SignIn, currentUser, useUser, UserButton } from "@clerk/nextjs";
-import { User } from "@clerk/nextjs/dist/types/server"
+import { getEmails } from "@/lib/server-actions"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
@@ -41,6 +41,19 @@ export function Sidebar({ className }: SidebarProps) {
   const formRef: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null);
   const { selectedFolder, setSelectedFolder } = useFolderContext();
   const { isLoaded, isSignedIn, user } = useUser()
+  const [unreadEmails, setUnreadEmails] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchReadStatus = async () => {
+      const result = await getEmails();
+      const unreadEmails = result.filter(email => email.read === false).length;
+      const emailFromSelectedFolder = result.find(email => email.folder === selectedFolder?.space);
+      setSelectedFolder({ name: capitalizeFirstLetter(emailFromSelectedFolder?.folder!), space: emailFromSelectedFolder?.folder!, unreadEmails: unreadEmails });
+      setUnreadEmails(unreadEmails);
+    };
+
+    fetchReadStatus();
+  }, [selectedFolder]);
 
   if (!user) return <SignIn afterSignInUrl='/dashboard' appearance={{ variables: { colorPrimary: "#000" } }} />;
 
