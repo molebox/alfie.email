@@ -46,7 +46,7 @@ import { NextRequest, NextResponse } from 'next/server';
 //   console.log('Saved email: ', newEmail)
 
 //   return NextResponse.json(newEmail, { status: 200 });
-}
+//}
 
 
 // import { Resend } from 'resend';
