@@ -49,7 +49,7 @@ lowlight.registerLanguage('ts', ts)
 export default function Dashboard() {
   const { selectedFolder, setSelectedFolder } = useFolderContext();
   const { isLoaded, isSignedIn, user } = useUser();
-  
+
   const editor = useEditor({
     extensions: [
       // StarterKit,
