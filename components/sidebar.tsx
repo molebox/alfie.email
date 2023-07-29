@@ -48,8 +48,10 @@ export function Sidebar({ className }: SidebarProps) {
       const result = await getEmails();
       const unreadEmails = result.filter(email => email.read === false).length;
       const emailFromSelectedFolder = result.find(email => email.folder === selectedFolder?.space);
-      setSelectedFolder({ name: capitalizeFirstLetter(emailFromSelectedFolder?.folder!), space: emailFromSelectedFolder?.folder!, unreadEmails: unreadEmails });
-      setUnreadEmails(unreadEmails);
+      if (emailFromSelectedFolder) {
+        setSelectedFolder({ name: capitalizeFirstLetter(emailFromSelectedFolder.folder), space: emailFromSelectedFolder.folder, unreadEmails: unreadEmails });
+        setUnreadEmails(unreadEmails);
+      }
     };
 
     fetchReadStatus();
