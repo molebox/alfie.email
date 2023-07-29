@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import prisma from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 // export async function POST(request: Request) {
 //   const formData = await request.formData()
@@ -64,11 +64,59 @@ import { NextRequest, NextResponse } from 'next/server';
 //   }
 // }
 
+interface EmailPayload {
+  From: string;
+  To: string;
+  CcFull: { Email: string }[];
+  BccFull: { Email: string }[];
+  Subject: string;
+  HtmlBody: string;
+  // Add other fields as needed
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json();
+    const data: EmailPayload = await request.json();
+    console.log('DATA: ', data)
+
+    const user = await prisma.user.findUnique({
+      where: { email: data.From },
+    });
+
+    // If the user isn't found, throw an error.
+    // You might want to handle this differently in your application
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Map CC addresses
+    const ccAddresses = data.CcFull.map((cc) => {
+      return { address: cc.Email };
+    });
+
+    // Map BCC addresses
+    const bccAddresses = data.BccFull.map((bcc) => {
+      return { address: bcc.Email };
+    });
+
+    const newEmail = await prisma.email.create({
+      data: {
+        subject: data.Subject,
+        body: data.HtmlBody,
+        from: data.From,
+        to: data.To,
+        type: 'RECEIVED',
+        user: { connect: { id: user.id } },
+        read: false,
+        CC: { create: ccAddresses },
+        BCC: { create: bccAddresses },
+      },
+    });
+
+    console.log('Saved email: ', newEmail);
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json({ error });
   }
 }
+
