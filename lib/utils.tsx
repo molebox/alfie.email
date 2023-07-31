@@ -27,7 +27,8 @@ export function formatDate(isoString: string): string {
   ) {
     day = "Today";
   } else {
-    day = date.toLocaleDateString(); // This will display the date in the format "MM/DD/YYYY". Adjust to your needs.
+    // This will display the date in the format "Month Day, Year". 
+    day = date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
   let hours = date.getHours();
@@ -35,10 +36,11 @@ export function formatDate(isoString: string): string {
   const ampm = hours >= 12 ? "pm" : "am";
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
-  
+
   const time = hours + ":" + minutes + ampm;
   return `${day}, ${time}`;
 }
+
 
 export const componentMapping = {
   h1: H1,

@@ -20,6 +20,11 @@ export type FolderType = {
 type FolderContextType = {
   selectedFolder: FolderType;
   setSelectedFolder: (folder: FolderType) => void;
+  addUserFolder: (folder: FolderType) => void;
+  addUserFolders: (folders: FolderType[]) => void;
+  removeUserFolder: (folder: FolderType) => void;
+  userFolders: FolderType[];  // Add this line
+  setUserFolders: (folders: FolderType[]) => void;  // Add this line
 };
 
 export const defaultFolders: FolderType[] = [
@@ -56,13 +61,60 @@ export const userFolders: FolderType[] = [
 
 const FolderContext = createContext<FolderContextType | undefined>(undefined);
 
+
 export function FolderProvider({ children }: { children: React.ReactNode }) {
-  const [selectedFolder, setSelectedFolder] = useState<FolderType>(defaultFolders[0]);
+  const [selectedFolder, setSelectedFolder] = useState<FolderType>(defaultFolders[1]);
+  const [userFolders, setUserFolders] = useState<FolderType[]>([
+    {
+      name: 'Family',
+      space: 'family',
+      icon: <UserGroupIcon className="mr-2 h-4 w-4" />,
+      deletable: false,
+      unreadEmails: 0
+    },
+    {
+      name: 'Travel',
+      space: 'travel',
+      icon: <GlobeEuropeAfricaIcon className="mr-2 h-4 w-4" />,
+      deletable: false,
+      unreadEmails: 0
+    },
+    {
+      name: 'Shopping',
+      space: 'shopping',
+      icon: <ShoppingBagIcon className="mr-2 h-4 w-4" />,
+      deletable: false,
+      unreadEmails: 0
+    },
+  ]);
+
+  const addUserFolder = (newFolder: FolderType) => {
+    setUserFolders(prevFolders => [...prevFolders, newFolder]);
+  };
+
+  const addUserFolders = (newFolders: FolderType[]) => {
+    setUserFolders(prevFolders => [...prevFolders, ...newFolders]);
+  };
+
+
+  const removeUserFolder = (folderToRemove: FolderType) => {
+    setUserFolders(currentFolders => currentFolders.filter(folder => folder.name !== folderToRemove.name));
+  };
 
   return (
-    <FolderContext.Provider value={{ selectedFolder, setSelectedFolder }}>
+    <FolderContext.Provider
+      value={{
+        selectedFolder,
+        setSelectedFolder,
+        addUserFolder,
+        addUserFolders,
+        removeUserFolder,
+        userFolders,
+        setUserFolders
+      }}>
       {children}
     </FolderContext.Provider>
+
   );
 }
 

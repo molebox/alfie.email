@@ -46,7 +46,7 @@ lowlight.registerLanguage('ts', ts)
 //   description: "Example music app using the components.",
 // }
 
-export default function Dashboard() {
+export default function Favorites() {
   const { selectedFolder, setSelectedFolder } = useFolderContext();
   const { isLoaded, isSignedIn, user } = useUser();
 
@@ -91,27 +91,6 @@ export default function Dashboard() {
     return null;
   }
 
-  // async function sendEmail() {
-  //   await fetch('/api/send', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify({
-  //       to: ['hello@richardhaines.dev'],
-  //       from: 'hello@alfie.email',
-  //       subject: 'Testing SendGrid',
-  //       firstName: 'Richard',
-  //       content: 'Next.js'
-  //     })
-  //   })
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       console.log(data)
-  //     }
-  //     )
-  // }
-
   return (
     <>
       <div className="block">
@@ -148,21 +127,21 @@ export default function Dashboard() {
                           value="unread"
                           className="border-none p-0 outline-none"
                         >
-                          {selectedFolder && <EmailFolder editor={editor} />}
+                          {selectedFolder && <EmailFolder folder="favorites" editor={editor} />}
                         </TabsContent>
                         <TabsContent
                           value="read"
                           className="h-full flex-col border-none p-0 data-[state=active]:flex"
                         >
                           <ScrollArea className="h-72 w-48 rounded-md border">
-                            {selectedFolder && <EmailFolder editor={editor} />}
+                            {selectedFolder && <EmailFolder folder="favorites" editor={editor} />}
                           </ScrollArea>
                         </TabsContent>
                       </Tabs>
                     ) : null}
 
                   </div>
-                ) : <EmailFolder editor={editor} />}
+                ) : <EmailFolder folder="favorites" editor={editor} />}
               </div>
             </div>
           </div>

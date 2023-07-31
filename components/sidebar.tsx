@@ -28,36 +28,55 @@ import {
 } from "@/components/ui/form"
 import { MinusCircleIcon } from "lucide-react"
 import { Badge } from "./ui/badge"
-import { FolderType, defaultFolders, useFolderContext, userFolders } from "@/lib/context"
+import { FolderType, useFolderContext, defaultFolders as defaultFoldersData } from "@/lib/context"
 import { SignIn, currentUser, useUser, UserButton } from "@clerk/nextjs";
 import { getEmails } from "@/lib/server-actions"
+import Link from "next/link"
+import { usePathname } from 'next/navigation'
+
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string
 }
 
 export function Sidebar({ className }: SidebarProps) {
+  const { userFolders, addUserFolder, removeUserFolder, setUserFolders } = useFolderContext();
   const [folders, setFolders] = useState<FolderType[]>(userFolders);
   const formRef: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null);
   const { selectedFolder, setSelectedFolder } = useFolderContext();
   const { isLoaded, isSignedIn, user } = useUser()
-  const [unreadEmails, setUnreadEmails] = useState<number>(0);
+  const [defaultFolders, setDefaultFolders] = useState<FolderType[]>(defaultFoldersData);
+  const pathname = usePathname()
 
   useEffect(() => {
-    const fetchReadStatus = async () => {
-      const result = await getEmails();
-      const unreadEmails = result.filter(email => email.read === false).length;
-      const emailFromSelectedFolder = result.find(email => email.folder === selectedFolder?.space);
-      if (emailFromSelectedFolder) {
-        setSelectedFolder({ name: capitalizeFirstLetter(emailFromSelectedFolder.folder), space: emailFromSelectedFolder.folder, unreadEmails: unreadEmails });
-        setUnreadEmails(unreadEmails);
-      }
-    };
+    async function fetchEmails() {
+      const result = await getEmails(selectedFolder?.space!);
 
-    fetchReadStatus();
-  }, [selectedFolder]);
+      // Use the already provided defaultFolders and userFolders, which should include all folders
+      const defaultFoldersToUpdate = [...defaultFolders];
+      const userFoldersToUpdate = [...userFolders];
 
-  if (!user) return <SignIn afterSignInUrl='/dashboard' appearance={{ variables: { colorPrimary: "#000" } }} />;
+      defaultFoldersToUpdate.forEach(folder => {
+        const emailsInFolder = result.filter(email => email.folder.toLowerCase() === folder.space.toLowerCase());
+        const unreadEmailsInFolder = emailsInFolder.filter(email => email.read === false).length;
+        folder.unreadEmails = unreadEmailsInFolder;
+      });
+
+      userFoldersToUpdate.forEach(folder => {
+        const emailsInFolder = result.filter(email => email.folder.toLowerCase() === folder.space.toLowerCase());
+        const unreadEmailsInFolder = emailsInFolder.filter(email => email.read === false).length;
+        folder.unreadEmails = unreadEmailsInFolder;
+      });
+
+      // Now update the defaultFolders and userFolders with the updated folders
+      setDefaultFolders(defaultFoldersToUpdate);
+      setUserFolders(userFoldersToUpdate);
+    }
+
+    fetchEmails();
+  }, []);
+
+  if (!user) return <SignIn afterSignInUrl='/standard' appearance={{ variables: { colorPrimary: "#000" } }} />;
 
   const formSchema = useMemo(() => z.object({
     newFolder: z.string().min(3, {
@@ -90,20 +109,27 @@ export function Sidebar({ className }: SidebarProps) {
       deletable: true,
       unreadEmails: 0
     };
-    setFolders([...folders, newFolder]);
+    addUserFolder(newFolder);  // Here, newFolder is a FolderType object representing the new folder being added
     form.reset({ newFolder: '' });
   }
+
 
   function removeFolder(folderToRemove: string) {
     // If the folder to remove is the currently selected one, switch to "Standard"
     if (selectedFolder?.space === folderToRemove) {
-      const standardUnreadEmails = selectedFolder.unreadEmails; // fetch or retrieve the current 'unreadEmails' for 'Standard'
+      const standardUnreadEmails = selectedFolder.unreadEmails;
       setSelectedFolder({ name: 'Standard', space: 'standard', unreadEmails: standardUnreadEmails });
     }
 
     // Filter out the removed folder from the folders list
-    setFolders(folders.filter(folder => folder.space !== folderToRemove));
+    const folderObjectToRemove = userFolders.find(folder => folder.space === folderToRemove);
+
+    if (folderObjectToRemove) {
+      removeUserFolder(folderObjectToRemove);
+    }
   }
+
+
 
 
 
@@ -136,13 +162,18 @@ export function Sidebar({ className }: SidebarProps) {
             Inboxes
           </h2>
           <div className="space-y-1">
-            {defaultFolders.map(folder => (
-              <Button key={folder.space} variant="ghost" className="w-full justify-start" onClick={() => setSelectedFolder({ name: folder.name, space: folder.name.toLocaleLowerCase(), unreadEmails: folder.unreadEmails })}>
-                {folder.icon}
-                {folder.name}
-                {folder.unreadEmails !== 0 ? <Badge variant='outline' className="ml-auto bg-red-100 border-slate-600">{folder.unreadEmails}</Badge> : null}
-              </Button>
-            ))}
+            {defaultFolders.map(folder => {
+              const isActive = `/${folder.space.toLowerCase()}` === pathname;
+              return (
+                <Link key={folder.space} href={`/${folder.space.toLowerCase()}`}>
+                  <Button variant="ghost" className={`w-full justify-start ${isActive ? 'bg-slate-200' : ''} ${isActive ? 'hover:bg-slate-200' : ''}`}>
+                    {folder.icon}
+                    {folder.name}
+                    {folder.unreadEmails !== 0 ? <Badge variant='outline' className="ml-auto bg-red-100 border-slate-600">{folder.unreadEmails}</Badge> : null}
+                  </Button>
+                </Link>
+              )
+            })}
           </div>
         </div>
         <div className="px-3 py-2">
@@ -176,22 +207,25 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
           <div className="space-y-1">
             <div className="space-y-1">
-              {folders.map(folder => (
-                <Button key={folder.space} variant="ghost" className="w-full justify-start" onClick={() => setSelectedFolder({ name: folder.name, space: folder.name.toLocaleLowerCase(), unreadEmails: folder.unreadEmails })}>
-                  {folder.icon}
-                  {folder.name}
-                  {folder.unreadEmails !== 0 ? <Badge variant='outline' className="ml-auto bg-red-100 border-slate-600">{folder.unreadEmails}</Badge> : null}
-                  {folder.deletable &&
-                    <MinusCircleIcon
-                      className="ml-auto h-4 w-4 hover:text-red-300"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevents triggering the Button's onClick 
-                        removeFolder(folder.space);
-                      }}
-                    />
-                  }
-                </Button>
+              {userFolders.map(folder => (
+                <Link key={folder.space} href={`/${folder.space.toLowerCase()}`}>
+                  <Button variant="ghost" className="w-full justify-start">
+                    {folder.icon}
+                    {folder.name}
+                    {folder.unreadEmails !== 0 ? <Badge variant='outline' className="ml-auto bg-red-100 border-slate-600">{folder.unreadEmails}</Badge> : null}
+                    {folder.deletable &&
+                      <MinusCircleIcon
+                        className="ml-auto h-4 w-4 hover:text-red-300"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevents triggering the Button's onClick 
+                          removeFolder(folder.space);
+                        }}
+                      />
+                    }
+                  </Button>
+                </Link>
               ))}
+
             </div>
           </div>
         </div>

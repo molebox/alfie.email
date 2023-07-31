@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children }: {
     console.log('no user');
     return (
       <SignUp
-        afterSignUpUrl="/dashboard"
+        afterSignUpUrl="/standard"
         appearance={{ variables: { colorPrimary: "#000" } }}
       />
     );

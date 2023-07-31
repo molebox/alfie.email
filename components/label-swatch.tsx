@@ -59,9 +59,9 @@ export function LabelSwatch() {
   return (
     <Popover>
       <PopoverTrigger>
-        <div className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground ml-4 bg-blue-100 px-2 py-1">
+        <div className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground ml-4 bg-blue-100 px-2 py-2">
           <SwatchIcon className="mr-2 h-4 w-4" />
-          Label
+          Add Label
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-full h-[300px] space-y-6">
@@ -79,7 +79,7 @@ export function LabelSwatch() {
                 Give your label a name and choose a color
               </FormDescription>
             </FormItem>
-            <TwitterPicker color={selectedColor} colors={defaultLabelColors} onChange={handleColorChange} />
+            <TwitterPicker triangle="hide" color={selectedColor} colors={defaultLabelColors} onChange={handleColorChange} />
             <Button type='submit'>Add</Button>
           </form>
         </Form>
