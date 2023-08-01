@@ -66,8 +66,8 @@ import { put } from '@vercel/blob';
 // }
 
 interface AttachmentPayload {
-  filename: string;
-  content: string; // base64 encoded string of the file content
+  Name: string;
+  Content: string; // base64 encoded string of the file content
 }
 
 interface EmailPayload {
@@ -107,10 +107,9 @@ export async function POST(request: NextRequest) {
     // Map attachments and upload to blob store
     let attachments: { filename: string; path: string }[] = [];
     if (data.Attachments) {
-      // Map attachments and upload to blob store
       const attachmentsPromises = data.Attachments.map(async (attachment) => {
-        const filename = attachment.filename;
-        const content = Buffer.from(attachment.content, 'base64');
+        const filename = attachment.Name;
+        const content = Buffer.from(attachment.Content, 'base64');
 
         const blob = await put(filename, content, { access: 'public' });
 
@@ -122,6 +121,7 @@ export async function POST(request: NextRequest) {
 
       attachments = await Promise.all(attachmentsPromises);
     }
+
 
     const newEmail = await prisma.email.create({
       data: {
