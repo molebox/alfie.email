@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { put } from '@vercel/blob';
 
 // export async function POST(request: Request) {
 //   const formData = await request.formData()
@@ -64,6 +65,11 @@ import prisma from '@/lib/prisma';
 //   }
 // }
 
+interface AttachmentPayload {
+  filename: string;
+  content: string; // base64 encoded string of the file content
+}
+
 interface EmailPayload {
   From: string;
   To: string;
@@ -71,7 +77,7 @@ interface EmailPayload {
   BccFull: { Email: string }[];
   Subject: string;
   HtmlBody: string;
-  // Add other fields as needed
+  Attachments: AttachmentPayload[];
 }
 
 export async function POST(request: NextRequest) {
@@ -84,7 +90,6 @@ export async function POST(request: NextRequest) {
     });
 
     // If the user isn't found, throw an error.
-    // You might want to handle this differently in your application
     if (!user) {
       throw new Error("User not found");
     }
@@ -99,6 +104,25 @@ export async function POST(request: NextRequest) {
       return { address: bcc.Email };
     });
 
+    // Map attachments and upload to blob store
+    let attachments: { filename: string; path: string }[] = [];
+    if (data.Attachments) {
+      // Map attachments and upload to blob store
+      const attachmentsPromises = data.Attachments.map(async (attachment) => {
+        const filename = attachment.filename;
+        const content = Buffer.from(attachment.content, 'base64');
+
+        const blob = await put(filename, content, { access: 'public' });
+
+        return {
+          filename: filename,
+          path: blob.url, // Store the URL of the blob
+        };
+      });
+
+      attachments = await Promise.all(attachmentsPromises);
+    }
+
     const newEmail = await prisma.email.create({
       data: {
         subject: data.Subject,
@@ -111,6 +135,7 @@ export async function POST(request: NextRequest) {
         folder: 'standard',
         CC: { create: ccAddresses },
         BCC: { create: bccAddresses },
+        attachments: { create: attachments }
       },
     });
 

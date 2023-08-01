@@ -36,7 +36,7 @@ export function EmailForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4 mt-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4 my-4">
         <FormField
           control={form.control}
           name="to"
@@ -51,33 +51,35 @@ export function EmailForm() {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="cc"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className='text-xs'>Cc</FormLabel>
-              <FormControl>
-                <Input placeholder="cc@example.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className='flex w-full'>
+          <FormField
+            control={form.control}
+            name="cc"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className='text-xs'>Cc</FormLabel>
+                <FormControl>
+                  <Input placeholder="cc@example.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* <FormField
-          control={form.control}
-          name="bcc"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className='text-xs'>Bcc</FormLabel>
-              <FormControl>
-                <Input placeholder="bcc@example.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
+          <FormField
+            control={form.control}
+            name="bcc"
+            render={({ field }) => (
+              <FormItem className='ml-4'>
+                <FormLabel className='text-xs'>Bcc</FormLabel>
+                <FormControl>
+                  <Input placeholder="bcc@example.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}

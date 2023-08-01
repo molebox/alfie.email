@@ -44,7 +44,8 @@ export default async function DashboardLayout({ children }: {
 
   return (
     <FolderProvider>
-      <div className="bg-slate-300">        {children}
+      <div className="bg-slate-300">
+        {children}
         <Toaster />
       </div>
     </FolderProvider>

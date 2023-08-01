@@ -4,17 +4,23 @@ import { useFolderContext, defaultFolders } from "@/lib/context"
 import { EmailCard } from "./email-card"
 import { Badge } from "./ui/badge"
 import { Separator } from "./ui/separator"
-import { EmailEditor } from "./email-editor"
 import { EmailForm } from "./email-form"
 import { getEmails } from "@/lib/server-actions"
 import { useEffect, useState } from "react"
 import { capitalizeFirstLetter, formatDate } from "@/lib/utils"
+import { Editor } from "@tiptap/react"
 
 
 interface EmailFolderProps {
   className?: string
-  editor: any
+  editor: Editor
   folder: string
+  state?: 'read' | 'unread'
+}
+
+interface Attachment {
+  filename: string;
+  path: string;
 }
 
 interface Email {
@@ -27,23 +33,28 @@ interface Email {
   createdAt: Date;
   updatedAt: Date;
   type: 'SENT' | 'RECEIVED';
+  attachments: Attachment[];
   userId: number;
 }
 
 
-export function EmailFolder({ editor, folder }: EmailFolderProps) {
+export function EmailFolder({ editor, folder, state }: EmailFolderProps) {
   const { selectedFolder, setSelectedFolder } = useFolderContext();
   const [emails, setEmails] = useState<Email[]>([]);
 
   useEffect(() => {
     const fetchEmails = async () => {
       const result = await getEmails(selectedFolder?.space!);
-      const emailsInFolder = result.filter(email => email.folder.toLowerCase() === folder.toLowerCase());
+      const emailsInFolder = result.map(email => ({
+        ...email,
+        attachments: email.attachments || []  // ensure attachments is an array
+      })).filter(email => email.folder.toLowerCase() === folder.toLowerCase());
       setEmails(emailsInFolder);
     };
 
     fetchEmails();
   }, [folder]);
+
 
   const handleClick = () => {
     setSelectedFolder({ name: selectedFolder?.name, space: selectedFolder?.name.toLocaleLowerCase(), unreadEmails: selectedFolder?.unreadEmails });
@@ -70,7 +81,6 @@ export function EmailFolder({ editor, folder }: EmailFolderProps) {
           </div>
         ) : null}
       </div>
-      {selectedFolder.space === 'compose' ? <EmailEditor editor={editor} /> : null}
       {emails.length >= 1 ? emails.map((email: Email) => (
         <EmailCard
           key={email.id}
@@ -78,6 +88,7 @@ export function EmailFolder({ editor, folder }: EmailFolderProps) {
           subject={email.subject}
           date={formatDate(email.createdAt.toString())}
           blurb={email.body}
+          includesAttachment={email.attachments.length > 0}
         />
       )) : null}
     </div>

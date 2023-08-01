@@ -23,21 +23,33 @@ model User {
 }
 
 model Email {
-  id        Int       @id @default(autoincrement())
-  subject   String
-  body      String
-  from      String
-  to        String
-  user      User      @relation(fields: [userId], references: [id])
-  userId    Int
-  read      Boolean   @default(false)
-  type      EmailType
-  folder    String
-  CC        CC[]
-  BCC       BCC[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         Int         @id @default(autoincrement())
+  subject    String
+  body       String
+  from       String
+  to         String
+  user       User        @relation(fields: [userId], references: [id])
+  userId     Int
+  read       Boolean     @default(false)
+  type       EmailType
+  folder     String
+  CC         CC[]
+  BCC        BCC[]
+  attachments Attachment[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
+
+model Attachment {
+  id        Int     @id @default(autoincrement())
+  filename  String
+  path      String
+  email     Email   @relation(fields: [emailId], references: [id])
+  emailId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 
 enum EmailType {
   SENT

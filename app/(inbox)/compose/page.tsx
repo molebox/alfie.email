@@ -10,7 +10,7 @@ import { EmailFolderWithTabs } from "@/components/email-folder-with-tabs"
 //   description: "Example music app using the components.",
 // }
 
-export default function Important() {
+export default function Compose() {
   const { isLoaded, isSignedIn, user } = useUser();
 
   if (!isLoaded || !isSignedIn) {
@@ -31,7 +31,7 @@ export default function Important() {
                 <div className="bg-background">
                   <div className="grid lg:grid-cols-5">
                     <Sidebar className="hidden lg:block" />
-                    {EmailFolderWithTabs({editor, folder: 'important'})}
+                    {EmailFolderWithTabs({editor, folder: 'compose'})}
                   </div>
                 </div>
               </div>
